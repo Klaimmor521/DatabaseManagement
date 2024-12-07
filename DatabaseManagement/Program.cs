@@ -11,7 +11,7 @@ namespace DatabaseManagement
         private static readonly string masterConnectionString = "Data Source=KLAIMMOR\\SQLEXPRESS;Initial Catalog=master;Integrated Security=True";
         static void Main()
         {
-
+            
         }
         static void CreateDatabaseAndTables()
         {
