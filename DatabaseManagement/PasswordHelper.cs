@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using BCrypt.Net;
 
 namespace DatabaseManagement
@@ -12,6 +13,10 @@ namespace DatabaseManagement
         public static bool VerifyPassword(string simplePassword, string hashPassword)
         {
             return BCrypt.Net.BCrypt.Verify(simplePassword, hashPassword);
+        }
+        public static bool ValidatePassword(string password)
+        {
+            return password.Length >= 8 && password.Any(char.IsDigit) && password.Any(char.IsUpper);
         }
     }
 }
