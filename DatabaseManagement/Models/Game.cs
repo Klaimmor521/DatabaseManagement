@@ -15,5 +15,9 @@ namespace DatabaseManagement.Models
         public GamePlatform GamePlatform { get; set; }
         public ICollection<Library> Libraries { get; set; }
         public ICollection<Review> Reviews { get; set; }
+
+        public void GameMenu() { }
+        public void AddGameInLibrary() { }
+        public void ViewGames() { }
     }
 }

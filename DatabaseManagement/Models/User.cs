@@ -13,5 +13,11 @@ namespace DatabaseManagement.Models
         public ICollection<Library> Libraries { get; set; }
         public ICollection<Friendship> Friendships { get; set; }
         public ICollection<Review> Reviews { get; set; }
+
+        public void UserMenu() { }
+        public void AddUser() { }
+        public void UpdateUser() { }
+        public void DeleteUser() { }
+        public void ViewUsers() { }
     }
 }

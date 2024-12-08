@@ -2,6 +2,7 @@
 using System.Data.Entity;
 using System.Data.SqlClient;
 using System.Configuration;
+using DatabaseManagement.Models;
 
 namespace DatabaseManagement
 {
