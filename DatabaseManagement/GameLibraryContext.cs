@@ -6,7 +6,7 @@ namespace DatabaseManagement
 {
     public class GameLibraryContext : DbContext
     {
-        public GameLibraryContext() : base("master") { }
+        public GameLibraryContext() : base("connectionToDatabase") { }
         public DbSet<Genre> Genres { get; set; }
         public DbSet<GamePlatform> GamePlatforms { get; set; }
         public DbSet<User> Users { get; set; }
