@@ -7,9 +7,9 @@ namespace DatabaseManagement.Models
     {
         public int FriendId { get; set; }
         public int UserId1 { get; set; }
-        public User User1 { get; set; }
         public int UserId2 { get; set; }
-        public User User2 { get; set; }
+        public virtual User User1 { get; set; }
+        public virtual User User2 { get; set; }
 
         public void FriendshipMenu() { }
         public void AddNewFriend() { }

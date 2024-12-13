@@ -14,5 +14,23 @@ namespace DatabaseManagement
         public DbSet<Library> Libraries { get; set; }
         public DbSet<Friendship> Friendships { get; set; }
         public DbSet<Review> Reviews { get; set; }
+
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Friendship>()
+                .HasKey(f => f.FriendId); //FriendId — первичный ключ
+
+            modelBuilder.Entity<Friendship>()
+                .HasRequired(f => f.User1)
+                .WithMany()
+                .HasForeignKey(f => f.UserId1)
+                .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<Friendship>()
+                .HasRequired(f => f.User2)
+                .WithMany()
+                .HasForeignKey(f => f.UserId2)
+                .WillCascadeOnDelete(false);
+        }
     }
 }

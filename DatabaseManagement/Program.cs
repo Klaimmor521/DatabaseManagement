@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Data.Entity;
 using System.Data.SqlClient;
 using System.Configuration;
-using DatabaseManagement.Models;
 
 namespace DatabaseManagement
 {
@@ -12,7 +10,8 @@ namespace DatabaseManagement
         private static readonly string masterConnectionString = ConfigurationManager.ConnectionStrings["connectionToMaster"].ConnectionString;
         static void Main()
         {
-            
+            MenuManager menuManager = new MenuManager();
+            menuManager.ShowMainMenu();
         }
         static void CreateDatabaseAndTables()
         {
