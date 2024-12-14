@@ -18,5 +18,26 @@ namespace DatabaseManagement.Models
         public void UpdateUser() { }
         public void DeleteUser() { }
         public void ViewUsers() { }
+
+        public void Information()
+        {
+
+        }
+        public void UpdateName()
+        {
+
+        }
+        public void UpdateEmail()
+        {
+
+        }
+        public void UpdatePassword()
+        {
+
+        }
+        public void UserReviews()
+        {
+
+        }
     }
 }

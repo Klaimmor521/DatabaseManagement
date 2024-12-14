@@ -12,6 +12,7 @@ namespace DatabaseManagement
         {
             MenuManager menuManager = new MenuManager();
             menuManager.ShowMainMenu();
+            //CreateDatabaseAndTables();
         }
         static void CreateDatabaseAndTables()
         {

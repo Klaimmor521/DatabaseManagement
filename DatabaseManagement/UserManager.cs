@@ -10,10 +10,12 @@ namespace DatabaseManagement
         private int _currentUserId;
         Library library = new Library();
         Game game = new Game();
+        Friendship friendship = new Friendship();
+        Review review = new Review();
+        User user = new User();
         public void Register()
         {
             Console.WriteLine("Регистрация:");
-
             string login = GetValidatedInput("Введите логин (минимум 3 символа): ", input => input.Length >= 3, "Логин должен содержать минимум 3 символа.");
             string nickname = GetValidatedInput("Введите никнейм: ", input => input.Length >= 3, "Логин должен содержать минимум 3 символа.");
             string email = GetValidatedInput("Введите email: ", input => input.Contains("@"), "Email должен содержать '@'.");
@@ -81,7 +83,7 @@ namespace DatabaseManagement
             Console.WriteLine("1. Библиотека");
             Console.WriteLine("2. Игры");
             Console.WriteLine("3. Профиль");
-            Console.WriteLine("4. Выход");
+            Console.WriteLine("4. Назад");
             string choice = Console.ReadLine();
 
             switch (choice)
@@ -119,20 +121,22 @@ namespace DatabaseManagement
             switch (choice)
             {
                 case "1":
-                    
+                    user.Information();
+                    break;
                 case "2":
-                    //UpdateName();
+                    user.UpdateName();
+                    break;
                 case "3":
-                    //UpdateEmail();
+                    user.UpdateEmail();
                     break;
                 case "4":
-                    //UpdatePassword();
+                    user.UpdatePassword();
                     break;
                 case "5":
-                    
+                    friendship.FriendshipMenu();
                     break;
                 case "6":
-                    
+                    review.ReviewMenu();
                     break;
                 case "7":
                     return;
@@ -141,7 +145,6 @@ namespace DatabaseManagement
                     break;
             }
         }
-
         private string GetValidatedInput(string prompt, Func<string, bool> validate, string errorMessage)
         {
             while (true)

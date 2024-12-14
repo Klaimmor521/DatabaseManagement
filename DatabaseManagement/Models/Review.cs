@@ -14,10 +14,36 @@ namespace DatabaseManagement.Models
         public int GameId { get; set; }
         public Game Game { get; set; }
 
-        public void ReviewMenu() { }
+        public void ReviewMenu() 
+        {
+            UserManager userManager = new UserManager();
+            Console.WriteLine("\nОтзывы:");
+            Console.WriteLine("1. Посмотреть отзывы об игре");
+            Console.WriteLine("2. Добавить отзыв");
+            Console.WriteLine("3. Назад");
+            Console.Write("Выберите действие: ");
+
+            string choice = Console.ReadLine();
+
+            switch (choice)
+            {
+                case "1":
+                    ViewReviewsAboutThisGame();
+                    break;
+                case "2":
+                    AddReview();
+                    break;
+                case "3":
+                    userManager.ShowProfileMenu();
+                    break;
+                default:
+                    Console.WriteLine("Неверный выбор, попробуйте снова.");
+                    break;
+            }
+        }
         public void AddReview() { }
         public void UpdateReview() { }
         public void DeleteReview() { }
-        public void ViewReviews() { }
+        public void ViewReviewsAboutThisGame() { }
     }
 }

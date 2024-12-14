@@ -13,6 +13,7 @@ namespace DatabaseManagement.Models
 
         public void LibraryMenu() 
         {
+            UserManager userManager = new UserManager();
             Console.WriteLine("\nБиблиотека:");
             Console.WriteLine("1. Посмотреть список игр");
             Console.WriteLine("2. Удалить игру из библиотеки");
@@ -30,13 +31,57 @@ namespace DatabaseManagement.Models
                     DeleteGameInLibrary();
                     break;
                 case "3":
+                    userManager.ShowProfileMenu();
+                    break;
+                default:
+                    Console.WriteLine("Неверный выбор, попробуйте снова.");
+                    break;
+            }
+        }
+        public void DeleteGameInLibrary() 
+        { 
+
+        }
+        public void ViewGamesInLibrary() 
+        {
+            Console.WriteLine("\nТип:");
+            Console.WriteLine("1. По убыванию");
+            Console.WriteLine("2. По возрастанию");
+            Console.WriteLine("3. По жанру");
+            Console.WriteLine("4. Назад");
+            Console.Write("Выберите действие: ");
+
+            string choice = Console.ReadLine();
+
+            switch (choice)
+            {
+                case "1":
+                    Descending();
+                    break;
+                case "2":
+                    Ascending();
+                    break;
+                case "3":
+                    WithGenres();
+                    break;
+                case "4":
                     return;
                 default:
                     Console.WriteLine("Неверный выбор, попробуйте снова.");
                     break;
             }
         }
-        public void DeleteGameInLibrary() { }
-        public void ViewGamesInLibrary() { }
+        public void Descending()
+        {
+
+        }
+        public void Ascending()
+        {
+
+        }
+        public void WithGenres()
+        {
+
+        }
     }
 }
