@@ -97,6 +97,34 @@ namespace DatabaseManagement.Models
                     break;
             }
         }
+        public void ByReviews()
+        {
+            Review review = new Review();
+            UserManager userManager = new UserManager();
+            Console.WriteLine("\nТип:");
+            Console.WriteLine("1. Вывести по положительным отзывам");
+            Console.WriteLine("2. Вывести по негативным отзывам");
+            Console.WriteLine("3. Назад");
+            Console.Write("Выберите действие: ");
+
+            string choice = Console.ReadLine();
+
+            switch (choice)
+            {
+                case "1":
+                    OutputReviewsByPositive();
+                    break;
+                case "2":
+                    OutputReviewsByNegative();
+                    break;
+                case "3":
+                    GameMenu();
+                    break;
+                default:
+                    Console.WriteLine("Неверный выбор, попробуйте снова.");
+                    break;
+            }
+        }
 
         public void ByReleaseDate()
         {
@@ -130,35 +158,6 @@ namespace DatabaseManagement.Models
         public void OutputReviewsByNegative()
         {
 
-        }
-
-        public void ByReviews()
-        {
-            Review review = new Review();
-            UserManager userManager = new UserManager();
-            Console.WriteLine("\nТип:");
-            Console.WriteLine("1. Вывести по положительным отзывам");
-            Console.WriteLine("2. Вывести по негативным отзывам");
-            Console.WriteLine("3. Назад");
-            Console.Write("Выберите действие: ");
-
-            string choice = Console.ReadLine();
-
-            switch (choice)
-            {
-                case "1":
-                    OutputReviewsByPositive();
-                    break;
-                case "2":
-                    OutputReviewsByNegative();
-                    break;
-                case "3":
-                    GameMenu();
-                    break;
-                default:
-                    Console.WriteLine("Неверный выбор, попробуйте снова.");
-                    break;
-            }
         }
     }
 }

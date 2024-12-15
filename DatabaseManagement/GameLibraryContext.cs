@@ -18,27 +18,30 @@ namespace DatabaseManagement
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
-            //Удаляет плюрализацию имен таблиц
-            modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();
-            base.OnModelCreating(modelBuilder);
+            //Отключаем автоматическую плюрализацию имён
+            modelBuilder.Conventions.Remove<System.Data.Entity.ModelConfiguration.Conventions.PluralizingTableNameConvention>();
 
+            //Настройка таблицы Users
             modelBuilder.Entity<User>().ToTable("Users");
+
+            //Проблема с User_UserId
+            //Настройка таблицы Friendship
+            modelBuilder.Entity<Friendship>()
+                .HasKey(f => f.FriendId); //Первичный ключ
+
+            modelBuilder.Entity<Friendship>()
+                .HasRequired(f => f.InitiatorUser) // Связь с InitiatorUser
+                .WithMany()
+                .HasForeignKey(f => f.InitiatorUserId)
+                .WillCascadeOnDelete(false); // Отключаем каскадное удаление
+
+            modelBuilder.Entity<Friendship>()
+                .HasRequired(f => f.RecipientUser) // Связь с RecipientUser
+                .WithMany()
+                .HasForeignKey(f => f.RecipientUserId)
+                .WillCascadeOnDelete(false); // Отключаем каскадное удаление
+
             base.OnModelCreating(modelBuilder);
-
-            modelBuilder.Entity<Friendship>()
-                .HasKey(f => f.FriendId); //FriendId — первичный ключ
-
-            modelBuilder.Entity<Friendship>()
-                .HasRequired(f => f.User1)
-                .WithMany()
-                .HasForeignKey(f => f.UserId1)
-                .WillCascadeOnDelete(false);
-
-            modelBuilder.Entity<Friendship>()
-                .HasRequired(f => f.User2)
-                .WithMany()
-                .HasForeignKey(f => f.UserId2)
-                .WillCascadeOnDelete(false);
         }
     }
 }

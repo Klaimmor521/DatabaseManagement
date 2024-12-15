@@ -38,10 +38,6 @@ namespace DatabaseManagement.Models
                     break;
             }
         }
-        public void DeleteGameInLibrary() 
-        { 
-
-        }
         public void ViewGamesInLibrary() 
         {
             Console.WriteLine("\nТип:");
@@ -81,6 +77,10 @@ namespace DatabaseManagement.Models
 
         }
         public void WithGenres()
+        {
+
+        }
+        public void DeleteGameInLibrary()
         {
 
         }

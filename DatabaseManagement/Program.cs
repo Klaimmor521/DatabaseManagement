@@ -2,7 +2,6 @@
 using System.Data.SqlClient;
 using System.Configuration;
 using System.Threading.Tasks;
-using Bogus;
 using DatabaseManagement.Models;
 using static DatabaseManagement.PasswordHelper;
 
@@ -12,11 +11,12 @@ namespace DatabaseManagement
     {
         private static readonly string connectionString = ConfigurationManager.ConnectionStrings["connectionToDatabase"].ConnectionString;
         private static readonly string masterConnectionString = ConfigurationManager.ConnectionStrings["connectionToMaster"].ConnectionString;
-        static void Main()
+        static async Task Main()
         {
-            MenuManager menuManager = new MenuManager();
-            menuManager.ShowMainMenu();
-            //SeedData.Seed();
+            //MenuManager menuManager = new MenuManager();
+            //menuManager.ShowMainMenu();
+            //SeedDataBogus.Seed();
+            await UsualSeedData.SeedAsync(); //Для него менять Main на: static async Task Main
         }
         static void CreateDatabaseAndTables()
         {
