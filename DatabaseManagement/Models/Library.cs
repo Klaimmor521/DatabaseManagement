@@ -65,7 +65,8 @@ namespace DatabaseManagement.Models
                     WithGenres();
                     break;
                 case "4":
-                    return;
+                    LibraryMenu();
+                    break;
                 default:
                     Console.WriteLine("Неверный выбор, попробуйте снова.");
                     break;

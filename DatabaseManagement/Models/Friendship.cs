@@ -14,11 +14,14 @@ namespace DatabaseManagement.Models
         public void FriendshipMenu() 
         {
             User user = new User();
+            UserManager userManager = new UserManager();
             Console.WriteLine("\nДрузья:");
             Console.WriteLine("1. Список пользователей");
             Console.WriteLine("2. Добавить в друзья");
             Console.WriteLine("3. Список всех друзей");
-            Console.WriteLine("4. Назад");
+            Console.WriteLine("4. Посмотреть список игр у друга");
+            Console.WriteLine("5. Убрать друга из друзей");
+            Console.WriteLine("6. Назад");
             Console.Write("Выберите действие: ");
 
             string choice = Console.ReadLine();
@@ -35,7 +38,14 @@ namespace DatabaseManagement.Models
                     ViewFriends();
                     break;
                 case "4":
-                    return;
+                    ViewListFriendGames();
+                    break;
+                case "5":
+                    DeleteFriendship();
+                    break;
+                case "6":
+                    userManager.ShowProfileMenu();
+                    break;
                 default:
                     Console.WriteLine("Неверный выбор, попробуйте снова.");
                     break;
@@ -44,5 +54,6 @@ namespace DatabaseManagement.Models
         public void AddNewFriend() { }
         public void DeleteFriendship() { }
         public void ViewFriends() { }
+        public void ViewListFriendGames() { }
     }
 }

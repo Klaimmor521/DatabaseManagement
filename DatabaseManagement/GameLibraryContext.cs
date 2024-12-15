@@ -1,6 +1,7 @@
 ﻿using DatabaseManagement.Models;
 using System;
 using System.Data.Entity;
+using System.Data.Entity.ModelConfiguration.Conventions;
 
 namespace DatabaseManagement
 {
@@ -17,6 +18,13 @@ namespace DatabaseManagement
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
+            //Удаляет плюрализацию имен таблиц
+            modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<User>().ToTable("Users");
+            base.OnModelCreating(modelBuilder);
+
             modelBuilder.Entity<Friendship>()
                 .HasKey(f => f.FriendId); //FriendId — первичный ключ
 

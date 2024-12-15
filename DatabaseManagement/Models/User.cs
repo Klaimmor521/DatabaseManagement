@@ -35,9 +35,9 @@ namespace DatabaseManagement.Models
         {
 
         }
-        public void UserReviews()
+        public void AllUserReviews()
         {
-
+            
         }
     }
 }

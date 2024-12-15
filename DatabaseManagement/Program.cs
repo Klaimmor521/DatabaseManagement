@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Data.SqlClient;
 using System.Configuration;
+using System.Threading.Tasks;
+using Bogus;
+using DatabaseManagement.Models;
+using static DatabaseManagement.PasswordHelper;
 
 namespace DatabaseManagement
 {
@@ -12,7 +16,7 @@ namespace DatabaseManagement
         {
             MenuManager menuManager = new MenuManager();
             menuManager.ShowMainMenu();
-            //CreateDatabaseAndTables();
+            //SeedData.Seed();
         }
         static void CreateDatabaseAndTables()
         {

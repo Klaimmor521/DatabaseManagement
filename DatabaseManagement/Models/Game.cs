@@ -55,13 +55,13 @@ namespace DatabaseManagement.Models
             UserManager userManager = new UserManager();
             Console.WriteLine("\nТип:");
             Console.WriteLine("1. По дате выпуска");
-            Console.WriteLine("3. По жанру");
-            Console.WriteLine("4. По цене");
-            Console.WriteLine("5. По имени");
-            Console.WriteLine("6. По количеству");
-            Console.WriteLine("7. Вывести те, которые есть у друзей");
-            Console.WriteLine("8. По отзывам");
-            Console.WriteLine("9. Назад");
+            Console.WriteLine("2. По жанру");
+            Console.WriteLine("3. По цене");
+            Console.WriteLine("4. По имени");
+            Console.WriteLine("5. По количеству");
+            Console.WriteLine("6. Вывести те, которые есть у друзей");
+            Console.WriteLine("7. По отзывам");
+            Console.WriteLine("8. Назад");
             Console.Write("Выберите действие: ");
 
             string choice = Console.ReadLine();
@@ -69,37 +69,96 @@ namespace DatabaseManagement.Models
             switch (choice)
             {
                 case "1":
-                    ViewGames();
+                    ByReleaseDate();
                     break;
                 case "2":
-                    AddGameInLibrary();
+                    ByGenre();
                     break;
                 case "3":
-                    review.ReviewMenu();
+                    ByPrice();
                     break;
                 case "4":
-                    ViewGames();
+                    ByName();
                     break;
                 case "5":
-                    ViewGames();
+                    ByQuantity();
                     break;
                 case "6":
-                    ViewGames();
+                    OutputThatFriendsHave();
                     break;
                 case "7":
-                    ViewGames();
+                    ByReviews();
                     break;
                 case "8":
-                    ViewGames();
-                    break;
-                case "9":
-                    userManager.ShowProfileMenu();
+                    GameMenu();
                     break;
                 default:
                     Console.WriteLine("Неверный выбор, попробуйте снова.");
                     break;
             }
-            //доделать
+        }
+
+        public void ByReleaseDate()
+        {
+
+        }
+        public void ByGenre()
+        {
+
+        }
+        public void ByPrice()
+        {
+
+        }
+        public void ByName()
+        {
+
+        }
+        public void ByQuantity()
+        {
+
+        }
+        public void OutputThatFriendsHave()
+        {
+
+        }
+
+        public void OutputReviewsByPositive()
+        {
+
+        }
+        public void OutputReviewsByNegative()
+        {
+
+        }
+
+        public void ByReviews()
+        {
+            Review review = new Review();
+            UserManager userManager = new UserManager();
+            Console.WriteLine("\nТип:");
+            Console.WriteLine("1. Вывести по положительным отзывам");
+            Console.WriteLine("2. Вывести по негативным отзывам");
+            Console.WriteLine("3. Назад");
+            Console.Write("Выберите действие: ");
+
+            string choice = Console.ReadLine();
+
+            switch (choice)
+            {
+                case "1":
+                    OutputReviewsByPositive();
+                    break;
+                case "2":
+                    OutputReviewsByNegative();
+                    break;
+                case "3":
+                    GameMenu();
+                    break;
+                default:
+                    Console.WriteLine("Неверный выбор, попробуйте снова.");
+                    break;
+            }
         }
     }
 }

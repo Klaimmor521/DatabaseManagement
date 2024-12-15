@@ -112,7 +112,7 @@ namespace DatabaseManagement
             Console.WriteLine("3. Обновить email");
             Console.WriteLine("4. Обновить пароль");
             Console.WriteLine("5. Друзья");
-            Console.WriteLine("6. Отзывы");
+            Console.WriteLine("6. Мои отзывы");
             Console.WriteLine("7. Назад");
             Console.Write("Выберите действие: ");
 
@@ -136,10 +136,36 @@ namespace DatabaseManagement
                     friendship.FriendshipMenu();
                     break;
                 case "6":
-                    review.ReviewMenu();
+                    UserReviews();
                     break;
                 case "7":
                     return;
+                default:
+                    Console.WriteLine("Неверный выбор, попробуйте снова.");
+                    break;
+            }
+        }
+        private void UserReviews()
+        {
+            Console.WriteLine("\nМои отзывы:");
+            Console.WriteLine("1. Список моих отзывов");
+            Console.WriteLine("2. Удалить отзыв");
+            Console.WriteLine("3. Назад");
+            Console.Write("Выберите действие: ");
+
+            string choice = Console.ReadLine();
+
+            switch (choice)
+            {
+                case "1":
+                    user.AllUserReviews();
+                    break;
+                case "2":
+                    review.DeleteReview();
+                    break;
+                case "3":
+                    UserMenu();
+                    break;
                 default:
                     Console.WriteLine("Неверный выбор, попробуйте снова.");
                     break;
