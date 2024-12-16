@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
 
 namespace DatabaseManagement.Models
 {
@@ -11,7 +13,7 @@ namespace DatabaseManagement.Models
         public int GameId { get; set; }
         public Game Game { get; set; }
 
-        public void LibraryMenu() 
+        public void LibraryMenu(int currentUserId) 
         {
             UserManager userManager = new UserManager();
             Console.WriteLine("\nБиблиотека:");
@@ -25,10 +27,10 @@ namespace DatabaseManagement.Models
             switch (choice)
             {
                 case "1":
-                    ViewGamesInLibrary();
+                    ViewGamesInLibrary(currentUserId);
                     break;
                 case "2":
-                    DeleteGameInLibrary();
+                    DeleteGameFromLibrary();
                     break;
                 case "3":
                     userManager.ShowProfileMenu();
@@ -38,7 +40,7 @@ namespace DatabaseManagement.Models
                     break;
             }
         }
-        public void ViewGamesInLibrary() 
+        public void ViewGamesInLibrary(int currentUserId) 
         {
             Console.WriteLine("\nТип:");
             Console.WriteLine("1. По убыванию");
@@ -52,35 +54,104 @@ namespace DatabaseManagement.Models
             switch (choice)
             {
                 case "1":
-                    Descending();
+                    Descending(currentUserId);
+                    LibraryMenu(currentUserId);
                     break;
                 case "2":
-                    Ascending();
+                    Ascending(currentUserId);
+                    LibraryMenu(currentUserId);
                     break;
                 case "3":
-                    WithGenres();
+                    WithGenres(currentUserId);
+                    LibraryMenu(currentUserId);
                     break;
                 case "4":
-                    LibraryMenu();
+                    LibraryMenu(currentUserId);
                     break;
                 default:
                     Console.WriteLine("Неверный выбор, попробуйте снова.");
                     break;
             }
         }
-        public void Descending()
+        public void Descending(int currentUserId)
         {
+            using (var context = new GameLibraryContext())
+            {
+                var library = context.Libraries
+                    .Include(l => l.Game)
+                    .Where(l => l.UserId == currentUserId)
+                    .OrderByDescending(l => l.Game.ReleaseDate)
+                    .ToList();
 
+                if (!library.Any())
+                {
+                    Console.WriteLine("\nВаша библиотека пуста.");
+                    return;
+                }
+
+                Console.WriteLine($"\nВывод игр по убыванию: ");
+                foreach (var item in library)
+                {
+                    Console.WriteLine($"Игра: {item.Game.GameName}");
+                    Console.WriteLine($"Платформа: {item.Game.GamePlatform.PlatformName}");
+                    Console.WriteLine($"Цена: {item.Game.Price} | Дата выхода: {item.Game.ReleaseDate.ToShortDateString()}");
+                    Console.WriteLine("--------------------------------");
+                }
+            }
         }
-        public void Ascending()
+        public void Ascending(int currentUserId)
         {
+            using (var context = new GameLibraryContext())
+            {
+                var library = context.Libraries
+                    .Include(l => l.Game)
+                    .Where(l => l.UserId == currentUserId)
+                    .OrderBy(l => l.Game.ReleaseDate)
+                    .ToList();
 
+                if (!library.Any())
+                {
+                    Console.WriteLine("\nВаша библиотека пуста.");
+                    return;
+                }
+
+                Console.WriteLine($"\nВывод игр по возрастанию: ");
+                foreach (var item in library)
+                {
+                    Console.WriteLine($"Игра: {item.Game.GameName}");
+                    Console.WriteLine($"Платформа: {item.Game.GamePlatform.PlatformName}");
+                    Console.WriteLine($"Цена: {item.Game.Price} | Дата выхода: {item.Game.ReleaseDate.ToShortDateString()}");
+                    Console.WriteLine("--------------------------------");
+                }
+            }
         }
-        public void WithGenres()
+        public void WithGenres(int currentUserId)
         {
+            using (var context = new GameLibraryContext())
+            {
+                var library = context.Libraries
+                    .Include(l => l.Game).Include("Game.Genre")
+                    .Where(l => l.UserId == currentUserId)
+                    .OrderBy(l => l.Game.Genre.GenreName)
+                    .ToList();
 
+                if (!library.Any())
+                {
+                    Console.WriteLine("\nВаша библиотека пуста.");
+                    return;
+                }
+
+                Console.WriteLine($"\nВывод игр по жанрам: ");
+                foreach (var item in library)
+                {
+                    Console.WriteLine($"Игра: {item.Game.GameName}");
+                    Console.WriteLine($"Жанр: {item.Game.Genre.GenreName}");
+                    Console.WriteLine($"Цена: {item.Game.Price} | Дата выхода: {item.Game.ReleaseDate.ToShortDateString()}");
+                    Console.WriteLine("--------------------------------");
+                }
+            }
         }
-        public void DeleteGameInLibrary()
+        public void DeleteGameFromLibrary()
         {
 
         }

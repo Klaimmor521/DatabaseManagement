@@ -1,5 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Linq;
+using System.Data.Entity;
 
 namespace DatabaseManagement.Models
 {
@@ -14,36 +15,34 @@ namespace DatabaseManagement.Models
         public int GameId { get; set; }
         public Game Game { get; set; }
 
-        public void ReviewMenu() 
+        public void ViewReviewsAboutThisGame() 
         {
-            UserManager userManager = new UserManager();
-            Console.WriteLine("\nОтзывы:");
-            Console.WriteLine("1. Посмотреть отзывы об игре");
-            Console.WriteLine("2. Добавить отзыв");
-            Console.WriteLine("3. Назад");
-            Console.Write("Выберите действие: ");
-
-            string choice = Console.ReadLine();
-
-            switch (choice)
+            using(var context = new GameLibraryContext())
             {
-                case "1":
-                    ViewReviewsAboutThisGame();
-                    break;
-                case "2":
-                    AddReview();
-                    break;
-                case "3":
-                    userManager.ShowProfileMenu();
-                    break;
-                default:
-                    Console.WriteLine("Неверный выбор, попробуйте снова.");
-                    break;
+                Console.WriteLine("Напиши для какой игры надо посмотреть отзывы: ");
+                string gameName = Console.ReadLine();
+                var reviews = context.Reviews
+                    .Include(r => r.User) 
+                    .Include(r => r.Game) 
+                    .Where(r => r.Game.GameName.Contains(gameName)) //Фильтрация по названию игры
+                    .OrderByDescending(r => r.CreatedAt) //Сортировка по дате
+                    .ToList();
+
+                if (!reviews.Any())
+                {
+                    Console.WriteLine($"Отзывы для игры '{gameName}' не найдены.");
+                    return;
+                }
+
+                Console.WriteLine($"\nОтзывы по игре: {gameName}");
+
+                foreach (var review in reviews)
+                {
+                    Console.WriteLine($"Пользователь: {review.User.Nickname} | Оценка: {review.Rating} | Дата: {review.CreatedAt.ToShortDateString()}");
+                    Console.WriteLine($"Текст: {review.ReviewText}");
+                    Console.WriteLine("--------------------------------");
+                }
             }
         }
-        public void AddReview() { }
-        public void UpdateReview() { }
-        public void DeleteReview() { }
-        public void ViewReviewsAboutThisGame() { }
     }
 }

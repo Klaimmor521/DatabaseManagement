@@ -93,9 +93,9 @@
   <ItemGroup>
     <Compile Include="GameLibraryContext.cs" />
     <Compile Include="MenuManager.cs" />
-    <Compile Include="Migrations\202412161039231_Initial.cs" />
-    <Compile Include="Migrations\202412161039231_Initial.Designer.cs">
-      <DependentUpon>202412161039231_Initial.cs</DependentUpon>
+    <Compile Include="Migrations\202412161226497_Initial.cs" />
+    <Compile Include="Migrations\202412161226497_Initial.Designer.cs">
+      <DependentUpon>202412161226497_Initial.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Game.cs" />
@@ -117,8 +117,8 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\202412161039231_Initial.resx">
-      <DependentUpon>202412161039231_Initial.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202412161226497_Initial.resx">
+      <DependentUpon>202412161226497_Initial.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

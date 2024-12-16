@@ -12,6 +12,7 @@ namespace DatabaseManagement
         Game game = new Game();
         Review review = new Review();
         User user = new User();
+        Wishlist wishlist = new Wishlist();
         public void Register()
         {
             Console.WriteLine("Регистрация:");
@@ -78,7 +79,6 @@ namespace DatabaseManagement
         }
         public void ShowProfileMenu()
         {
-            Console.Clear();
             Console.WriteLine("Это Ваша игровая библиотека!");
             Console.WriteLine("Вы в Меню профиля! Выберите действие:");
             Console.WriteLine("1. Библиотека");
@@ -90,7 +90,7 @@ namespace DatabaseManagement
             switch (choice)
             {
                 case "1":
-                    library.LibraryMenu();
+                    library.LibraryMenu(_currentUserId);
                     break;
                 case "2":
                     game.GameMenu();
@@ -112,9 +112,10 @@ namespace DatabaseManagement
             Console.WriteLine("2. Обновить имя");
             Console.WriteLine("3. Обновить email");
             Console.WriteLine("4. Обновить пароль");
-            Console.WriteLine("5. Мои отзывы");
-            Console.WriteLine("6. Удалить аккаунт");
-            Console.WriteLine("7. Назад");
+            Console.WriteLine("5. Список желаемых игр");
+            Console.WriteLine("6. Мои отзывы");
+            Console.WriteLine("7. Удалить аккаунт");
+            Console.WriteLine("8. Назад");
             Console.Write("Выберите действие: ");
 
             string choice = Console.ReadLine();
@@ -123,23 +124,32 @@ namespace DatabaseManagement
             {
                 case "1":
                     user.Information(_currentUserId);
+                    ShowProfileMenu();
                     break;
                 case "2":
-                    user.UpdateName();
+                    UpdateName(_currentUserId);
+                    ShowProfileMenu();
                     break;
                 case "3":
-                    user.UpdateEmail();
+                    UpdateEmail(_currentUserId);
+                    ShowProfileMenu();
                     break;
                 case "4":
-                    user.UpdatePassword();
+                    UpdatePassword(_currentUserId);
+                    ShowProfileMenu();
                     break;
                 case "5":
-                    UserReviews();
+                    wishlist.WishlistMenu(_currentUserId);
+                    ShowProfileMenu();
                     break;
                 case "6":
-                    user.DeleteUser();
+                    UserReviews();
+                    ShowProfileMenu();
                     break;
                 case "7":
+                    user.DeleteUser();
+                    break;
+                case "8":
                     game.GameMenu();
                     break;
                 default:
@@ -152,6 +162,71 @@ namespace DatabaseManagement
             Console.WriteLine("\nМои отзывы:");
             Console.WriteLine("1. Список моих отзывов");
             Console.WriteLine("2. Удалить отзыв");
+            Console.WriteLine("3. Редактировать отзыв");
+            Console.WriteLine("4. Назад");
+            Console.Write("Выберите действие: ");
+
+            string choice = Console.ReadLine();
+
+            switch (choice)
+            {
+                case "1":
+                    user.AllUserReviews(_currentUserId);
+                    break;
+                case "2":
+                    DeleteReview(_currentUserId);
+                    break;
+                case "3":
+                    UpdateReview(_currentUserId);
+                    break;
+                case "4":
+                    UserMenu(_currentUserId);
+                    break;
+                default:
+                    Console.WriteLine("Неверный выбор, попробуйте снова.");
+                    break;
+            }
+        }
+        public void UpdateName(int currentUserId)
+        {
+            using (var context = new GameLibraryContext())
+            {
+                var user = context.Users.FirstOrDefault(u => u.UserId == currentUserId);
+
+                if (user == null)
+                {
+                    Console.WriteLine("Пользователь не найден.");
+                    return;
+                }
+
+                Console.Write("Введите новой никнейм: ");
+                string newName = Console.ReadLine();
+
+                if (string.IsNullOrWhiteSpace(newName))
+                {
+                    Console.WriteLine("Имя не может быть пустым.");
+                    return;
+                }
+
+                user.Nickname = newName;
+
+                try
+                {
+                    context.SaveChanges();
+                    Console.WriteLine("Имя пользователя успешно обновлено.");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Ошибка при обновлении имени: {ex.Message}");
+                }
+            }
+        }
+        public void ReviewMenu()
+        {
+            Game game = new Game();
+            Console.WriteLine("\nОтзывы:");
+            Console.WriteLine("1. Посмотреть отзывы об игре");
+            Console.WriteLine("2. Добавить отзыв");
             Console.WriteLine("3. Назад");
             Console.Write("Выберите действие: ");
 
@@ -160,18 +235,40 @@ namespace DatabaseManagement
             switch (choice)
             {
                 case "1":
-                    user.AllUserReviews();
+                    review.ViewReviewsAboutThisGame();
+                    game.GameMenu();
                     break;
                 case "2":
-                    review.DeleteReview();
+                    AddReview(_currentUserId);
+                    game.GameMenu();
                     break;
                 case "3":
-                    UserMenu(_currentUserId);
+                    game.GameMenu();
                     break;
                 default:
                     Console.WriteLine("Неверный выбор, попробуйте снова.");
                     break;
             }
+        }
+        public void AddReview(int currentUserId)
+        {
+
+        }
+        public void UpdateReview(int currentUserId)
+        {
+
+        }
+        public void DeleteReview(int currentUserId)
+        {
+
+        }
+        public void UpdateEmail(int currentUserId)
+        {
+
+        }
+        public void UpdatePassword(int currentUserId)
+        {
+
         }
         private string GetValidatedInput(string prompt, Func<string, bool> validate, string errorMessage)
         {

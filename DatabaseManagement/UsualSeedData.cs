@@ -1,9 +1,6 @@
 ﻿using DatabaseManagement.Models;
 using System;
-using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DatabaseManagement
@@ -19,7 +16,6 @@ namespace DatabaseManagement
                 //await InsertUsers(context, 500);        //Пользователи
                 //await InsertGames(context, 900);        //Игры
                 //await InsertReviews(context, 500);      //Отзывы
-                //await InsertFriendships(context, 50);
             }
         }
 
@@ -49,54 +45,24 @@ namespace DatabaseManagement
             }
         }
 
-        //private static async Task InsertFriendships(GameLibraryContext context, int count)
-        //{
-        //    if (!context.Friendships.Any())
-        //    {
-        //        var userIds = context.Users.Select(u => u.UserId).ToList();
-        //        var friendships = new HashSet<(int, int)>();
+        private static async Task InsertUsers(GameLibraryContext context, int count)
+        {
+            if (!context.Users.Any())
+            {
+                var users = Enumerable.Range(1, count)
+                    .Select(i => new User
+                    {
+                        Nickname = $"User{i}",
+                        Login = $"login{i}",
+                        Email = $"user{i}@example.com",
+                        Password = $"password_hash_{i}"
+                    })
+                    .ToList();
 
-        //        var random = new Random();
-
-        //        while (friendships.Count < count)
-        //        {
-        //            int userId1 = userIds[random.Next(userIds.Count)];
-        //            int userId2 = userIds[random.Next(userIds.Count)];
-
-        //            //Уникальность пар: сам себе не друг и нет дублирования
-        //            if (userId1 != userId2 && friendships.Add((Math.Min(userId1, userId2), Math.Max(userId1, userId2))))
-        //            {
-        //                //Добавляем только уникальные пары
-        //                context.Friendships.Add(new Friendship
-        //                {
-        //                    UserId1 = userId1,
-        //                    UserId2 = userId2
-        //                });
-        //            }
-        //        }
-
-        //        await context.SaveChangesAsync();
-        //    }
-        //}
-
-        //private static async Task InsertUsers(GameLibraryContext context, int count)
-        //{
-        //    if (!context.Users.Any())
-        //    {
-        //        var users = Enumerable.Range(1, count)
-        //            .Select(i => new User
-        //            {
-        //                Nickname = $"User{i}",
-        //                Login = $"login{i}",
-        //                Email = $"user{i}@example.com",
-        //                Password = $"password_hash_{i}"
-        //            })
-        //            .ToList();
-
-        //        context.Users.AddRange(users);
-        //        await context.SaveChangesAsync();
-        //    }
-        //}
+                context.Users.AddRange(users);
+                await context.SaveChangesAsync();
+            }
+        }
 
         private static async Task InsertGames(GameLibraryContext context, int count)
         {
