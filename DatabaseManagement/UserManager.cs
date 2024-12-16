@@ -10,7 +10,6 @@ namespace DatabaseManagement
         private int _currentUserId;
         Library library = new Library();
         Game game = new Game();
-        Friendship friendship = new Friendship();
         Review review = new Review();
         User user = new User();
         public void Register()
@@ -72,12 +71,14 @@ namespace DatabaseManagement
                     return;
                 }
                 _currentUserId = user.UserId; //Сохранение ID текущего пользователя
+                //Console.WriteLine("User ID = " + _currentUserId);
                 Console.WriteLine("Вход выполнен успешно!");
                 ShowProfileMenu(); //Переход в меню Профиля
             }
         }
         public void ShowProfileMenu()
         {
+            Console.Clear();
             Console.WriteLine("Это Ваша игровая библиотека!");
             Console.WriteLine("Вы в Меню профиля! Выберите действие:");
             Console.WriteLine("1. Библиотека");
@@ -95,7 +96,7 @@ namespace DatabaseManagement
                     game.GameMenu();
                     break;
                 case "3":
-                    UserMenu();
+                    UserMenu(_currentUserId);
                     break;
                 case "4":
                     return;
@@ -104,15 +105,15 @@ namespace DatabaseManagement
                     break;
             }
         }
-        private void UserMenu()
+        private void UserMenu(int currentUserId)
         {
             Console.WriteLine("\nПрофиль:");
             Console.WriteLine("1. Информация");
             Console.WriteLine("2. Обновить имя");
             Console.WriteLine("3. Обновить email");
             Console.WriteLine("4. Обновить пароль");
-            Console.WriteLine("5. Друзья");
-            Console.WriteLine("6. Мои отзывы");
+            Console.WriteLine("5. Мои отзывы");
+            Console.WriteLine("6. Удалить аккаунт");
             Console.WriteLine("7. Назад");
             Console.Write("Выберите действие: ");
 
@@ -121,7 +122,7 @@ namespace DatabaseManagement
             switch (choice)
             {
                 case "1":
-                    user.Information();
+                    user.Information(_currentUserId);
                     break;
                 case "2":
                     user.UpdateName();
@@ -133,13 +134,14 @@ namespace DatabaseManagement
                     user.UpdatePassword();
                     break;
                 case "5":
-                    friendship.FriendshipMenu();
-                    break;
-                case "6":
                     UserReviews();
                     break;
+                case "6":
+                    user.DeleteUser();
+                    break;
                 case "7":
-                    return;
+                    game.GameMenu();
+                    break;
                 default:
                     Console.WriteLine("Неверный выбор, попробуйте снова.");
                     break;
@@ -164,7 +166,7 @@ namespace DatabaseManagement
                     review.DeleteReview();
                     break;
                 case "3":
-                    UserMenu();
+                    UserMenu(_currentUserId);
                     break;
                 default:
                     Console.WriteLine("Неверный выбор, попробуйте снова.");

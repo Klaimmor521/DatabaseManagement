@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Data.Entity;
 
 namespace DatabaseManagement.Models
 {
@@ -11,17 +13,29 @@ namespace DatabaseManagement.Models
         public string Password { get; set; }
         public string Email { get; set; }
         public ICollection<Library> Libraries { get; set; }
-        public ICollection<Friendship> Friendships { get; set; }
         public ICollection<Review> Reviews { get; set; }
 
-        public void AddUser() { }
-        public void UpdateUser() { }
-        public void DeleteUser() { }
-        public void ViewUsers() { }
-
-        public void Information()
+        public void Information(int currentUserId)
         {
+            using(var context = new GameLibraryContext())
+            {
+                var user = context.Users.Include(u => u.Libraries)
+                    .SingleOrDefault(u => u.UserId == currentUserId);
 
+                //Console.WriteLine("User ID = " + currentUserId);
+
+                if (user == null)
+                {
+                    Console.WriteLine("Пользователь не найден.");
+                    return;
+                }
+
+                Console.WriteLine("Информация о пользователе:");
+                Console.WriteLine($"Логин: {user.Login}");
+                Console.WriteLine($"Никнейм: {user.Nickname}");
+                Console.WriteLine($"Email: {user.Email}");
+                Console.WriteLine($"Количество игр в библиотеке: {user.Libraries.Count}");
+            }
         }
         public void UpdateName()
         {
@@ -38,6 +52,10 @@ namespace DatabaseManagement.Models
         public void AllUserReviews()
         {
             
+        }
+        public void DeleteUser()
+        {
+
         }
     }
 }

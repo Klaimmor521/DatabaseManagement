@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
+using System.Runtime.Remoting.Contexts;
 
 namespace DatabaseManagement.Models
 {
@@ -48,20 +51,17 @@ namespace DatabaseManagement.Models
                     break;
             }
         }
-        public void AddGameInLibrary() { }
         public void ViewGames() 
         {
             Review review = new Review();
             UserManager userManager = new UserManager();
             Console.WriteLine("\nТип:");
-            Console.WriteLine("1. По дате выпуска");
-            Console.WriteLine("2. По жанру");
-            Console.WriteLine("3. По цене");
-            Console.WriteLine("4. По имени");
-            Console.WriteLine("5. По количеству");
-            Console.WriteLine("6. Вывести те, которые есть у друзей");
-            Console.WriteLine("7. По отзывам");
-            Console.WriteLine("8. Назад");
+            Console.WriteLine("1. По жанру");
+            Console.WriteLine("2. По цене");
+            Console.WriteLine("3. По имени");
+            Console.WriteLine("4. По количеству");
+            Console.WriteLine("5. По отзывам");
+            Console.WriteLine("6. Назад");
             Console.Write("Выберите действие: ");
 
             string choice = Console.ReadLine();
@@ -69,27 +69,21 @@ namespace DatabaseManagement.Models
             switch (choice)
             {
                 case "1":
-                    ByReleaseDate();
-                    break;
-                case "2":
                     ByGenre();
                     break;
-                case "3":
+                case "2":
                     ByPrice();
                     break;
-                case "4":
+                case "3":
                     ByName();
                     break;
-                case "5":
+                case "4":
                     ByQuantity();
                     break;
-                case "6":
-                    OutputThatFriendsHave();
-                    break;
-                case "7":
+                case "5":
                     ByReviews();
                     break;
-                case "8":
+                case "6":
                     GameMenu();
                     break;
                 default:
@@ -99,8 +93,7 @@ namespace DatabaseManagement.Models
         }
         public void ByReviews()
         {
-            Review review = new Review();
-            UserManager userManager = new UserManager();
+            
             Console.WriteLine("\nТип:");
             Console.WriteLine("1. Вывести по положительным отзывам");
             Console.WriteLine("2. Вывести по негативным отзывам");
@@ -126,17 +119,33 @@ namespace DatabaseManagement.Models
             }
         }
 
-        public void ByReleaseDate()
-        {
-
-        }
         public void ByGenre()
         {
+            using (var context = new GameLibraryContext())
+            {
+                Console.Write("Введите жанр для поиска игр: ");
+                string genre = Console.ReadLine();
 
+                var games = context.Games
+                .Where(g => g.Genre.GenreName == genre) 
+                .ToList();
+
+                if (!games.Any())
+                {
+                    Console.WriteLine($"Игры с жанром '{genre}' не найдены.");
+                    return;
+                }
+
+                Console.WriteLine($"Список игр в жанре '{genre}': ");
+                foreach (var game in games)
+                {
+                    Console.WriteLine($"- {game.GameName} | Цена: {game.Price} | Дата выхода: {game.ReleaseDate.ToShortDateString()}");
+                }
+            } 
         }
         public void ByPrice()
         {
-
+            
         }
         public void ByName()
         {
@@ -144,11 +153,29 @@ namespace DatabaseManagement.Models
         }
         public void ByQuantity()
         {
+            using (var context = new GameLibraryContext())
+            {
+                Console.Write("Введите количество игр, которые надо вывести: ");
+                int count = Convert.ToInt32(Console.ReadLine());
 
-        }
-        public void OutputThatFriendsHave()
-        {
+                var games = context.Games
+                .Include(g => g.Genre) // Загружаем данные о жанре
+                .OrderByDescending(g => g.ReleaseDate) //Сортировка по дате выпуска, новые игры первыми
+                .Take(count) //Ограничение количества
+                .ToList();
 
+                if (!games.Any())
+                {
+                    Console.WriteLine("Список игр пуст.");
+                    return;
+                }
+
+                Console.WriteLine($"Топ-{count} игр, которые актуальны по дате:");
+                foreach (var game in games)
+                {
+                    Console.WriteLine($"- {game.GameName} | Жанр: {game.Genre.GenreName} | Цена: {game.Price} | Дата выхода: {game.ReleaseDate.ToShortDateString()}");
+                }
+            }
         }
 
         public void OutputReviewsByPositive()
@@ -156,6 +183,11 @@ namespace DatabaseManagement.Models
 
         }
         public void OutputReviewsByNegative()
+        {
+
+        }
+
+        public void AddGameInLibrary() 
         {
 
         }

@@ -4,6 +4,7 @@ using System.Configuration;
 using System.Threading.Tasks;
 using DatabaseManagement.Models;
 using static DatabaseManagement.PasswordHelper;
+using Spectre.Console;
 
 namespace DatabaseManagement
 {
@@ -11,12 +12,13 @@ namespace DatabaseManagement
     {
         private static readonly string connectionString = ConfigurationManager.ConnectionStrings["connectionToDatabase"].ConnectionString;
         private static readonly string masterConnectionString = ConfigurationManager.ConnectionStrings["connectionToMaster"].ConnectionString;
-        static async Task Main()
+        static void Main()
         {
-            //MenuManager menuManager = new MenuManager();
-            //menuManager.ShowMainMenu();
+            MenuManager menuManager = new MenuManager();
+            menuManager.ShowMainMenu();
+
             //SeedDataBogus.Seed();
-            await UsualSeedData.SeedAsync(); //Для него менять Main на: static async Task Main
+            //await UsualSeedData.SeedAsync(); //Для него менять Main на: static async Task Main
         }
         static void CreateDatabaseAndTables()
         {
@@ -81,14 +83,15 @@ namespace DatabaseManagement
             );
             END;
 
-            IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'Friendship')
+            IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'Wishlist')
             BEGIN
-            CREATE TABLE Friendship (
-                FriendId INT PRIMARY KEY IDENTITY(1,1),  
-                UserId1 INT NOT NULL,                    
-                UserId2 INT NOT NULL,                    
-                CONSTRAINT FK_Friendship_User1 FOREIGN KEY (UserId1) REFERENCES Users(UserId) ON DELETE CASCADE,
-                CONSTRAINT FK_Friendship_User2 FOREIGN KEY (UserId2) REFERENCES Users(UserId) ON DELETE NO ACTION
+            CREATE TABLE Wishlist (
+                WishlistId INT IDENTITY(1,1) PRIMARY KEY, 
+                UserId INT NOT NULL,                     
+                GameId INT NOT NULL,                     
+                AddedDate DATETIME DEFAULT GETDATE(),    
+                CONSTRAINT FK_Wishlist_Users FOREIGN KEY (UserId) REFERENCES Users(UserId),
+                CONSTRAINT FK_Wishlist_Game FOREIGN KEY (GameId) REFERENCES Game(GameId)
             );
             END;
 
@@ -105,7 +108,6 @@ namespace DatabaseManagement
                 CONSTRAINT FK_Review_Game FOREIGN KEY (GameId) REFERENCES Game(GameId) ON DELETE CASCADE
             );
             END;";
-
 
             using (var connection = new SqlConnection(masterConnectionString))
             {

@@ -32,37 +32,31 @@ namespace DatabaseManagement
                 //}
 
                 //Генерация игр
-                //if (!context.Games.Any())
-                //{
-                    //var gameFaker = new Faker<Game>()
-                    //    .RuleFor(g => g.GameName, f => f.Commerce.ProductName())
-                    //    .RuleFor(g => g.Price, f => f.Random.Decimal(10, 100))
-                    //    .RuleFor(g => g.ReleaseDate, f => f.Date.Past(5))
-                    //    .RuleFor(g => g.GenreId, f => f.Random.Number(1, 50))
-                    //    .RuleFor(g => g.GamePlatformId, f => f.Random.Number(1, 50));
+                //var gameFaker = new Faker<Game>()
+                //    .RuleFor(g => g.GameName, f => f.Commerce.ProductName())
+                //    .RuleFor(g => g.Price, f => f.Random.Decimal(10, 100))
+                //    .RuleFor(g => g.ReleaseDate, f => f.Date.Past(5))
+                //    .RuleFor(g => g.GenreId, f => f.Random.Number(1, 50))
+                //    .RuleFor(g => g.GamePlatformId, f => f.Random.Number(1, 50));
 
-                    //var games = gameFaker.Generate(100);
-                    //context.Games.AddRange(games);
-                    //context.SaveChanges();
-                //}
+                //var games = gameFaker.Generate(100);
+                //context.Games.AddRange(games);
+                //context.SaveChanges();
 
-                ////Генерация отзывов
-                //if (!context.Reviews.Any())
-                //{
-                //    var existingUserIds = context.Users.Select(u => u.UserId).ToList();
-                //    var existingGameIds = context.Games.Select(g => g.GameId).ToList();
+                //Генерация отзывов
+                //var existingUserIds = context.Users.Select(u => u.UserId).ToList();
+                //var existingGameIds = context.Games.Select(g => g.GameId).ToList();
 
-                //    var reviewFaker = new Faker<Review>()
-                //        .RuleFor(r => r.ReviewText, f => f.Rant.Review())
-                //        .RuleFor(r => r.Rating, f => f.Random.Number(1, 10))
-                //        .RuleFor(r => r.CreatedAt, f => f.Date.Recent(30))
-                //        .RuleFor(r => r.UserId, f => f.PickRandom(existingUserIds))
-                //        .RuleFor(r => r.GameId, f => f.PickRandom(existingGameIds));
+                //var reviewFaker = new Faker<Review>()
+                //    .RuleFor(r => r.ReviewText, f => f.Rant.Review())
+                //    .RuleFor(r => r.Rating, f => f.Random.Number(1, 10))
+                //    .RuleFor(r => r.CreatedAt, f => f.Date.Recent(30))
+                //    .RuleFor(r => r.UserId, f => f.PickRandom(existingUserIds))
+                //    .RuleFor(r => r.GameId, f => f.PickRandom(existingGameIds));
 
-                //    var reviews = reviewFaker.Generate(1000);
-                //    context.Reviews.AddRange(reviews);
-                //    context.SaveChanges();
-                //}
+                //var reviews = reviewFaker.Generate(8);
+                //context.Reviews.AddRange(reviews);
+                //context.SaveChanges();
                 Console.WriteLine("Данные успешно добавлены!");
             }
         }
