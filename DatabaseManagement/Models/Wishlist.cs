@@ -98,7 +98,7 @@ namespace DatabaseManagement.Models
                     .Include(w => w.Game)
                     .FirstOrDefault(w => w.UserId == currentUserId && w.Game.GameName == gameName);
 
-                if (wishlistItem == null)
+                if (wishlistItem == null || wishlistItem.Game == null)
                 {
                     Console.WriteLine("Ошибка: Игра не найдена в вашем списке желаемого.");
                     return;
@@ -107,7 +107,7 @@ namespace DatabaseManagement.Models
                 context.Wishlists.Remove(wishlistItem);
                 context.SaveChanges();
 
-                Console.WriteLine($"Игра '{wishlistItem.Game.GameName}' успешно удалена из вашего списка желаемого.");
+                Console.WriteLine($"Игра '{gameName}' успешно удалена из вашего списка желаемого.");
             }
         }
 

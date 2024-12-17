@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Spectre.Console;
+using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
@@ -23,40 +24,54 @@ namespace DatabaseManagement.Models
             Review review = new Review();
             Wishlist wishlist = new Wishlist();
 
-            Console.WriteLine("\nИгры:");
-            Console.WriteLine("1. Посмотреть список игр");
-            Console.WriteLine("2. Добавить игру в библиотеку");
-            Console.WriteLine("3. Добавить игру в желаемые");
-            Console.WriteLine("4. Отзывы");
-            Console.WriteLine("5. Назад");
-            Console.Write("Выберите действие: ");
+            //Заголовок для меню
+            AnsiConsole.Write(
+                new FigletText("Game Menu")
+                    .Color(Color.Blue));
 
-            string choice = Console.ReadLine();
+            //Меню выбора действий
+            var choice = AnsiConsole.Prompt(
+                new SelectionPrompt<string>()
+                    .Title("[bold yellow]Выберите действие:[/]")
+                    .AddChoices(new[]
+                    {
+                "1. Посмотреть список игр",
+                "2. Добавить игру в библиотеку",
+                "3. Добавить игру в желаемые",
+                "4. Отзывы",
+                "5. Назад"
+                    })
+                    .HighlightStyle("cyan"));
 
+            //Обработка выбора
             switch (choice)
             {
-                case "1":
+                case "1. Посмотреть список игр":
                     ViewGames(currentUserId);
                     break;
-                case "2":
+
+                case "2. Добавить игру в библиотеку":
                     AddGameInLibrary(currentUserId);
                     GameMenu(currentUserId);
                     break;
-                case "3":
+
+                case "3. Добавить игру в желаемые":
                     wishlist.AddToWishlist(currentUserId);
                     GameMenu(currentUserId);
                     break;
-                case "4":
+
+                case "4. Отзывы":
                     review.ReviewMenu(currentUserId);
                     GameMenu(currentUserId);
                     break;
-                case "5":
-                    // Возвращаемся к меню профиля
-                    UserManager userManager = new UserManager();
+
+                case "5. Назад":
+                    var userManager = new UserManager();
                     userManager.ShowProfileMenu(currentUserId);
                     break;
+
                 default:
-                    Console.WriteLine("Неверный выбор, попробуйте снова.");
+                    AnsiConsole.MarkupLine("[bold red]Неверный выбор, попробуйте снова.[/]");
                     GameMenu(currentUserId);
                     break;
             }

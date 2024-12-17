@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Data.Entity;
+using Spectre.Console;
 
 namespace DatabaseManagement.Models
 {
@@ -18,29 +19,43 @@ namespace DatabaseManagement.Models
         public void ReviewMenu(int currentUserId)
         {
             Game game = new Game();
-            Console.WriteLine("\nОтзывы:");
-            Console.WriteLine("1. Посмотреть отзывы об игре");
-            Console.WriteLine("2. Добавить отзыв");
-            Console.WriteLine("3. Назад");
-            Console.Write("Выберите действие: ");
 
-            string choice = Console.ReadLine();
+            //Заголовок с рамкой и цветом
+            AnsiConsole.Write(
+                new FigletText("Reviews")
+                    .Color(Color.Cyan1));
 
+            //Меню выбора действий
+            var choice = AnsiConsole.Prompt(
+                new SelectionPrompt<string>()
+                    .Title("[bold cyan]Выберите действие в разделе Отзывы:[/]")
+                    .AddChoices(new[]
+                    {
+                "1. Посмотреть отзывы об игре",
+                "2. Добавить отзыв",
+                "3. Назад"
+                    })
+                    .HighlightStyle("yellow"));
+
+            //Обработка выбора пользователя
             switch (choice)
             {
-                case "1":
+                case "1. Посмотреть отзывы об игре":
                     ViewReviewsAboutThisGame();
                     game.GameMenu(currentUserId);
                     break;
-                case "2":
+
+                case "2. Добавить отзыв":
                     AddReview(currentUserId);
                     game.GameMenu(currentUserId);
                     break;
-                case "3":
+
+                case "3. Назад":
                     game.GameMenu(currentUserId);
                     break;
+
                 default:
-                    Console.WriteLine("Неверный выбор, попробуйте снова.");
+                    AnsiConsole.MarkupLine("[bold red]Неверный выбор, попробуйте снова.[/]");
                     ReviewMenu(currentUserId);
                     break;
             }

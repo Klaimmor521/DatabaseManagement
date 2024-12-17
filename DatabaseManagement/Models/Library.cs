@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Spectre.Console;
+using System;
 using System.Data.Entity;
 using System.Linq;
 
@@ -14,29 +15,42 @@ namespace DatabaseManagement.Models
 
         public void LibraryMenu(int currentUserId)
         {
-            Console.WriteLine("\nБиблиотека:");
-            Console.WriteLine("1. Посмотреть список игр");
-            Console.WriteLine("2. Удалить игру из библиотеки");
-            Console.WriteLine("3. Назад");
-            Console.Write("Выберите действие: ");
+            //Заголовок с рамкой и цветом
+            AnsiConsole.Write(
+                new FigletText("Library")
+                    .Color(Color.Yellow));
 
-            string choice = Console.ReadLine();
+            //Меню выбора действий
+            var choice = AnsiConsole.Prompt(
+                new SelectionPrompt<string>()
+                    .Title("[bold cyan]Выберите действие в библиотеке:[/]")
+                    .AddChoices(new[]
+                    {
+                "1. Посмотреть список игр",
+                "2. Удалить игру из библиотеки",
+                "3. Назад"
+                    })
+                    .HighlightStyle("green"));
 
+            //Обработка выбора пользователя
             switch (choice)
             {
-                case "1":
+                case "1. Посмотреть список игр":
                     ViewGamesInLibrary(currentUserId);
                     break;
-                case "2":
+
+                case "2. Удалить игру из библиотеки":
                     DeleteGameFromLibrary(currentUserId);
                     LibraryMenu(currentUserId);
                     break;
-                case "3":
-                    UserManager userManager = new UserManager();
+
+                case "3. Назад":
+                    var userManager = new UserManager();
                     userManager.ShowProfileMenu(currentUserId);
                     break;
+
                 default:
-                    Console.WriteLine("Неверный выбор, попробуйте снова.");
+                    AnsiConsole.MarkupLine("[bold red]Неверный выбор, попробуйте снова.[/]");
                     LibraryMenu(currentUserId);
                     break;
             }
@@ -180,7 +194,7 @@ namespace DatabaseManagement.Models
                 context.Libraries.Remove(libraryItem);
                 context.SaveChanges();
 
-                Console.WriteLine($"Игра '{libraryItem.Game.GameName}' успешно удалена из вашей библиотеки.");
+                Console.WriteLine($"Игра '{gameName}' успешно удалена из вашей библиотеки.");
             }
         }
     }

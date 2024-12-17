@@ -3,6 +3,7 @@ using System.Linq;
 using System.Data.Entity;
 using DatabaseManagement.Models;
 using static DatabaseManagement.PasswordHelper;
+using Spectre.Console;
 
 namespace DatabaseManagement
 {
@@ -82,29 +83,39 @@ namespace DatabaseManagement
 
         public void ShowProfileMenu(int currentUserId)
         {
-            Console.WriteLine("Это Ваша игровая библиотека!");
-            Console.WriteLine("Вы в Меню профиля! Выберите действие:");
-            Console.WriteLine("1. Библиотека");
-            Console.WriteLine("2. Игры");
-            Console.WriteLine("3. Профиль");
-            Console.WriteLine("4. Назад");
-            string choice = Console.ReadLine();
+            //Информационный текст
+            AnsiConsole.MarkupLine("[bold cyan]Это Ваша игровая библиотека![/]");
+            AnsiConsole.MarkupLine("[bold yellow]Вы в Меню профиля! Выберите действие:[/]");
 
+            //Меню выбора действий
+            var choice = AnsiConsole.Prompt(
+                new SelectionPrompt<string>()
+                    .Title("[bold white]Выберите действие:[/]")
+                    .AddChoices(new[]
+                    {
+                "1. Библиотека",
+                "2. Игры",
+                "3. Профиль",
+                "4. Назад"
+                    })
+                    .HighlightStyle("cyan"));
+
+            //Обработка выбора
             switch (choice)
             {
-                case "1":
+                case "1. Библиотека":
                     library.LibraryMenu(currentUserId);
                     break;
-                case "2":
+                case "2. Игры":
                     game.GameMenu(currentUserId);
                     break;
-                case "3":
+                case "3. Профиль":
                     UserMenu(currentUserId);
                     break;
-                case "4":
+                case "4. Назад":
                     return;
                 default:
-                    Console.WriteLine("Неверный выбор, попробуйте снова.");
+                    AnsiConsole.MarkupLine("[bold red]Неверный выбор, попробуйте снова.[/]");
                     ShowProfileMenu(currentUserId);
                     break;
             }
@@ -112,53 +123,71 @@ namespace DatabaseManagement
 
         private void UserMenu(int currentUserId)
         {
-            Console.WriteLine("\nПрофиль:");
-            Console.WriteLine("1. Информация");
-            Console.WriteLine("2. Обновить имя");
-            Console.WriteLine("3. Обновить email");
-            Console.WriteLine("4. Обновить пароль");
-            Console.WriteLine("5. Список желаемых игр");
-            Console.WriteLine("6. Мои отзывы");
-            Console.WriteLine("7. Удалить аккаунт");
-            Console.WriteLine("8. Назад");
-            Console.Write("Выберите действие: ");
+            // Заголовок с рамкой и цветом
+            AnsiConsole.Write(
+                new FigletText("Profile")
+                    .Color(Color.Cyan1));
 
-            string choice = Console.ReadLine();
+            // Меню выбора действий
+            var choice = AnsiConsole.Prompt(
+                new SelectionPrompt<string>()
+                    .Title("[bold cyan]Выберите действие в профиле:[/]")
+                    .AddChoices(new[]
+                    {
+                "1. Информация",
+                "2. Обновить имя",
+                "3. Обновить email",
+                "4. Обновить пароль",
+                "5. Список желаемых игр",
+                "6. Мои отзывы",
+                "7. Удалить аккаунт",
+                "8. Назад"
+                    })
+                    .HighlightStyle("yellow"));
 
+            // Обработка выбора пользователя
             switch (choice)
             {
-                case "1":
+                case "1. Информация":
                     user.Information(currentUserId);
-                    ShowProfileMenu(currentUserId);
+                    UserMenu(currentUserId);
                     break;
-                case "2":
+
+                case "2. Обновить имя":
                     UpdateName(currentUserId);
-                    ShowProfileMenu(currentUserId);
+                    UserMenu(currentUserId);
                     break;
-                case "3":
+
+                case "3. Обновить email":
                     UpdateEmail(currentUserId);
-                    ShowProfileMenu(currentUserId);
+                    UserMenu(currentUserId);
                     break;
-                case "4":
+
+                case "4. Обновить пароль":
                     UpdatePassword(currentUserId);
-                    ShowProfileMenu(currentUserId);
+                    UserMenu(currentUserId);
                     break;
-                case "5":
+
+                case "5. Список желаемых игр":
                     wishlist.WishlistMenu(currentUserId);
-                    ShowProfileMenu(currentUserId);
+                    UserMenu(currentUserId);
                     break;
-                case "6":
+
+                case "6. Мои отзывы":
                     UserReviews(currentUserId);
-                    ShowProfileMenu(currentUserId);
+                    UserMenu(currentUserId);
                     break;
-                case "7":
+
+                case "7. Удалить аккаунт":
                     user.DeleteUser(currentUserId);
                     break;
-                case "8":
-                    game.GameMenu(currentUserId);
+
+                case "8. Назад":
+                    ShowProfileMenu(currentUserId);
                     break;
+
                 default:
-                    Console.WriteLine("Неверный выбор, попробуйте снова.");
+                    AnsiConsole.MarkupLine("[bold red]Неверный выбор, попробуйте снова.[/]");
                     UserMenu(currentUserId);
                     break;
             }
@@ -233,7 +262,13 @@ namespace DatabaseManagement
 
                 var review = context.Reviews
                     .Include(r => r.Game)
-                    .FirstOrDefault(r => r.UserId == currentUserId && r.Game.GameName == gameName);
+                     .FirstOrDefault(r => r.UserId == currentUserId && r.Game.GameName.ToLower() == gameName.ToLower());
+
+                if (review == null)
+                {
+                    Console.WriteLine("Ошибка: Отзыв для указанной игры не найден.");
+                    return;
+                }
 
                 int rating;
                 while (true)
@@ -342,8 +377,8 @@ namespace DatabaseManagement
                 }
 
                 string newPassword = GetValidatedInput("Введите пароль (минимум 8 символов, 1 заглавная буква, 1 цифра): ", ValidatePassword, "Пароль должен быть минимум 8 символов, содержать хотя бы одну заглавную букву и одну цифру.");
-
-                userToUpdate.Password = newPassword;
+                string hashedPassword = HashPassword(newPassword);
+                userToUpdate.Password = hashedPassword;
 
                 try
                 {
