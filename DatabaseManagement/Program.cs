@@ -2,9 +2,6 @@
 using System.Data.SqlClient;
 using System.Configuration;
 using System.Threading.Tasks;
-using DatabaseManagement.Models;
-using static DatabaseManagement.PasswordHelper;
-using Spectre.Console;
 
 namespace DatabaseManagement
 {
@@ -16,7 +13,6 @@ namespace DatabaseManagement
         {
             MenuManager menuManager = new MenuManager();
             menuManager.ShowMainMenu();
-
             //SeedDataBogus.Seed();
             //await UsualSeedData.SeedAsync(); //Для него менять Main на: static async Task Main
         }

@@ -13,23 +13,16 @@ namespace DatabaseManagement.Models
         public DateTime ReleaseDate { get; set; }
         public int GenreId { get; set; }
         public Genre Genre { get; set; }
-        public int GamePlatformId {  get; set; }
+        public int GamePlatformId { get; set; }
         public GamePlatform GamePlatform { get; set; }
         public ICollection<Library> Libraries { get; set; }
         public ICollection<Review> Reviews { get; set; }
-        private int _currentUserId; //Поле для хранения ID текущего пользователя
 
-        //Конструктор с передачей currentUserId
-        public Game(int currentUserId)
-        {
-            _currentUserId = currentUserId;
-        }
-        public Game() { }
-        public void GameMenu() 
+        public void GameMenu(int currentUserId)
         {
             Review review = new Review();
-            UserManager userManager = new UserManager();
             Wishlist wishlist = new Wishlist();
+
             Console.WriteLine("\nИгры:");
             Console.WriteLine("1. Посмотреть список игр");
             Console.WriteLine("2. Добавить игру в библиотеку");
@@ -43,32 +36,34 @@ namespace DatabaseManagement.Models
             switch (choice)
             {
                 case "1":
-                    ViewGames();
+                    ViewGames(currentUserId);
                     break;
                 case "2":
-                    AddGameInLibrary();
-                    GameMenu();
+                    AddGameInLibrary(currentUserId);
+                    GameMenu(currentUserId);
                     break;
                 case "3":
-                    wishlist.AddToWishlist(_currentUserId);
-                    GameMenu();
+                    wishlist.AddToWishlist(currentUserId);
+                    GameMenu(currentUserId);
                     break;
                 case "4":
-                    userManager.ReviewMenu();
-                    GameMenu();
+                    review.ReviewMenu(currentUserId);
+                    GameMenu(currentUserId);
                     break;
                 case "5":
-                    userManager.ShowProfileMenu();
+                    // Возвращаемся к меню профиля
+                    UserManager userManager = new UserManager();
+                    userManager.ShowProfileMenu(currentUserId);
                     break;
                 default:
                     Console.WriteLine("Неверный выбор, попробуйте снова.");
+                    GameMenu(currentUserId);
                     break;
             }
         }
-        public void ViewGames() 
+
+        public void ViewGames(int currentUserId)
         {
-            Review review = new Review();
-            UserManager userManager = new UserManager();
             Console.WriteLine("\nТип:");
             Console.WriteLine("1. По жанру");
             Console.WriteLine("2. По цене");
@@ -83,36 +78,37 @@ namespace DatabaseManagement.Models
             switch (choice)
             {
                 case "1":
-                    ByGenre();
-                    GameMenu();
+                    ByGenre(currentUserId);
+                    GameMenu(currentUserId);
                     break;
                 case "2":
-                    ByPrice();
-                    GameMenu();
+                    ByPrice(currentUserId);
+                    GameMenu(currentUserId);
                     break;
                 case "3":
-                    ByName();
-                    GameMenu();
+                    ByName(currentUserId);
+                    GameMenu(currentUserId);
                     break;
                 case "4":
-                    ByQuantity();
-                    GameMenu();
+                    ByQuantity(currentUserId);
+                    GameMenu(currentUserId);
                     break;
                 case "5":
-                    ByReviews();
-                    GameMenu();
+                    ByReviews(currentUserId);
+                    GameMenu(currentUserId);
                     break;
                 case "6":
-                    GameMenu();
+                    GameMenu(currentUserId);
                     break;
                 default:
                     Console.WriteLine("Неверный выбор, попробуйте снова.");
+                    ViewGames(currentUserId);
                     break;
             }
         }
-        public void ByReviews()
+
+        public void ByReviews(int currentUserId)
         {
-            
             Console.WriteLine("\nТип:");
             Console.WriteLine("1. Вывести по положительным отзывам");
             Console.WriteLine("2. Вывести по негативным отзывам");
@@ -125,22 +121,23 @@ namespace DatabaseManagement.Models
             {
                 case "1":
                     OutputReviewsByPositive();
-                    GameMenu();
+                    GameMenu(currentUserId);
                     break;
                 case "2":
                     OutputReviewsByNegative();
-                    GameMenu();
+                    GameMenu(currentUserId);
                     break;
                 case "3":
-                    GameMenu();
+                    GameMenu(currentUserId);
                     break;
                 default:
                     Console.WriteLine("Неверный выбор, попробуйте снова.");
+                    ByReviews(currentUserId);
                     break;
             }
         }
 
-        public void ByGenre()
+        public void ByGenre(int currentUserId)
         {
             using (var context = new GameLibraryContext())
             {
@@ -148,7 +145,7 @@ namespace DatabaseManagement.Models
                 string genre = Console.ReadLine();
 
                 var games = context.Games
-                .Where(g => g.Genre.GenreName == genre) 
+                .Where(g => g.Genre.GenreName == genre)
                 .ToList();
 
                 if (!games.Any())
@@ -162,17 +159,72 @@ namespace DatabaseManagement.Models
                 {
                     Console.WriteLine($"- {game.GameName} | Цена: {game.Price} | Дата выхода: {game.ReleaseDate.ToShortDateString()}");
                 }
-            } 
+            }
         }
-        public void ByPrice()
-        {
-            
-        }
-        public void ByName()
-        {
 
+        public void ByPrice(int currentUserId)
+        {
+            using (var context = new GameLibraryContext())
+            {
+                Console.Write("Введите максимальную цену для поиска игр: ");
+                if (!decimal.TryParse(Console.ReadLine(), out decimal maxPrice))
+                {
+                    Console.WriteLine("Ошибка: Введите корректное числовое значение для цены.");
+                    return;
+                }
+
+                var games = context.Games
+                    .Where(g => g.Price <= maxPrice) //Фильтрация по цене
+                    .OrderBy(g => g.Price) //Сортировка по возрастанию цены
+                    .ToList();
+
+                if (!games.Any())
+                {
+                    Console.WriteLine($"Игры с ценой до {maxPrice} не найдены.");
+                    return;
+                }
+
+                Console.WriteLine($"Список игр с ценой до {maxPrice}: ");
+                foreach (var game in games)
+                {
+                    Console.WriteLine($"- {game.GameName} | Цена: {game.Price} | Дата выхода: {game.ReleaseDate.ToShortDateString()}");
+                }
+            }
         }
-        public void ByQuantity()
+
+        public void ByName(int currentUserId)
+        {
+            using (var context = new GameLibraryContext())
+            {
+                Console.Write("Введите название игры (или его часть) для поиска: ");
+                string nameInput = Console.ReadLine();
+
+                if (string.IsNullOrWhiteSpace(nameInput))
+                {
+                    Console.WriteLine("Ошибка: Название не должно быть пустым.");
+                    return;
+                }
+
+                var games = context.Games
+                    .Where(g => g.GameName.Contains(nameInput)) //Фильтрация по подстроке в названии
+                    .OrderBy(g => g.GameName) //Сортировка по имени
+                    .ToList();
+
+                if (!games.Any())
+                {
+                    Console.WriteLine($"Игры с названием, содержащим '{nameInput}', не найдены.");
+                    return;
+                }
+
+                Console.WriteLine($"Список игр, содержащих '{nameInput}':");
+                foreach (var game in games)
+                {
+                    Console.WriteLine($"- {game.GameName} | Цена: {game.Price} | Дата выхода: {game.ReleaseDate.ToShortDateString()}");
+                }
+            }
+        }
+
+        public void ByQuantity(int currentUserId)
         {
             using (var context = new GameLibraryContext())
             {
@@ -180,9 +232,9 @@ namespace DatabaseManagement.Models
                 int count = Convert.ToInt32(Console.ReadLine());
 
                 var games = context.Games
-                .Include(g => g.Genre) 
-                .OrderByDescending(g => g.ReleaseDate) //Сортировка по дате выпуска, новые игры первыми
-                .Take(count) //Ограничение количества
+                .Include(g => g.Genre)
+                .OrderByDescending(g => g.ReleaseDate)
+                .Take(count)
                 .ToList();
 
                 if (!games.Any())
@@ -204,14 +256,14 @@ namespace DatabaseManagement.Models
             using (var context = new GameLibraryContext())
             {
                 var positiveReviews = context.Reviews
-                    .Include(u => u.User)       
-                    .Include(g => g.Game)       
-                    .Where(r => r.Rating >= 7) //Фильтр для положительных отзывов
+                    .Include(u => u.User)
+                    .Include(g => g.Game)
+                    .Where(r => r.Rating >= 7)
                     .ToList();
 
                 if (!positiveReviews.Any())
                 {
-                    Console.WriteLine($"Положительная отзывы отсутствуют.");
+                    Console.WriteLine($"Положительные отзывы отсутствуют.");
                     return;
                 }
 
@@ -227,6 +279,7 @@ namespace DatabaseManagement.Models
                 }
             }
         }
+
         public void OutputReviewsByNegative()
         {
             using (var context = new GameLibraryContext())
@@ -234,7 +287,7 @@ namespace DatabaseManagement.Models
                 var negativeReviews = context.Reviews
                     .Include(u => u.User)
                     .Include(g => g.Game)
-                    .Where(r => r.Rating < 6) //Фильтр для положительных отзывов
+                    .Where(r => r.Rating < 6)
                     .ToList();
 
                 if (!negativeReviews.Any())
@@ -256,9 +309,38 @@ namespace DatabaseManagement.Models
             }
         }
 
-        public void AddGameInLibrary() 
+        public void AddGameInLibrary(int currentUserId)
         {
+            using (var context = new GameLibraryContext())
+            {
+                Console.Write("Введите название игры, которую хотите добавить в библиотеку: ");
+                string gameName = Console.ReadLine();
 
+                var game = context.Games.FirstOrDefault(g => g.GameName == gameName);
+                if (game == null)
+                {
+                    Console.WriteLine("Ошибка: Игра с таким названием не найдена.");
+                    return;
+                }
+
+                var exists = context.Libraries.Any(l => l.UserId == currentUserId && l.GameId == game.GameId);
+                if (exists)
+                {
+                    Console.WriteLine("Эта игра уже есть в вашей библиотеке! Выбери другую.");
+                    return;
+                }
+
+                var newLibraryItem = new Library
+                {
+                    UserId = currentUserId,
+                    GameId = game.GameId
+                };
+
+                context.Libraries.Add(newLibraryItem);
+                context.SaveChanges();
+
+                Console.WriteLine($"Игра '{game.GameName}' успешно добавлена в вашу библиотеку.");
+            }
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 
@@ -13,9 +12,8 @@ namespace DatabaseManagement.Models
         public int GameId { get; set; }
         public Game Game { get; set; }
 
-        public void LibraryMenu(int currentUserId) 
+        public void LibraryMenu(int currentUserId)
         {
-            UserManager userManager = new UserManager();
             Console.WriteLine("\nБиблиотека:");
             Console.WriteLine("1. Посмотреть список игр");
             Console.WriteLine("2. Удалить игру из библиотеки");
@@ -30,17 +28,21 @@ namespace DatabaseManagement.Models
                     ViewGamesInLibrary(currentUserId);
                     break;
                 case "2":
-                    DeleteGameFromLibrary();
+                    DeleteGameFromLibrary(currentUserId);
+                    LibraryMenu(currentUserId);
                     break;
                 case "3":
-                    userManager.ShowProfileMenu();
+                    UserManager userManager = new UserManager();
+                    userManager.ShowProfileMenu(currentUserId);
                     break;
                 default:
                     Console.WriteLine("Неверный выбор, попробуйте снова.");
+                    LibraryMenu(currentUserId);
                     break;
             }
         }
-        public void ViewGamesInLibrary(int currentUserId) 
+
+        public void ViewGamesInLibrary(int currentUserId)
         {
             Console.WriteLine("\nТип:");
             Console.WriteLine("1. По убыванию");
@@ -70,15 +72,18 @@ namespace DatabaseManagement.Models
                     break;
                 default:
                     Console.WriteLine("Неверный выбор, попробуйте снова.");
+                    ViewGamesInLibrary(currentUserId);
                     break;
             }
         }
+
         public void Descending(int currentUserId)
         {
             using (var context = new GameLibraryContext())
             {
                 var library = context.Libraries
                     .Include(l => l.Game)
+                    .Include(l => l.Game.GamePlatform)
                     .Where(l => l.UserId == currentUserId)
                     .OrderByDescending(l => l.Game.ReleaseDate)
                     .ToList();
@@ -99,12 +104,14 @@ namespace DatabaseManagement.Models
                 }
             }
         }
+
         public void Ascending(int currentUserId)
         {
             using (var context = new GameLibraryContext())
             {
                 var library = context.Libraries
                     .Include(l => l.Game)
+                    .Include(l => l.Game.GamePlatform)
                     .Where(l => l.UserId == currentUserId)
                     .OrderBy(l => l.Game.ReleaseDate)
                     .ToList();
@@ -125,6 +132,7 @@ namespace DatabaseManagement.Models
                 }
             }
         }
+
         public void WithGenres(int currentUserId)
         {
             using (var context = new GameLibraryContext())
@@ -151,9 +159,29 @@ namespace DatabaseManagement.Models
                 }
             }
         }
-        public void DeleteGameFromLibrary()
-        {
 
+        public void DeleteGameFromLibrary(int currentUserId)
+        {
+            using (var context = new GameLibraryContext())
+            {
+                Console.Write("Введите название игры, которую хотите удалить из библиотеки: ");
+                string gameName = Console.ReadLine();
+
+                var libraryItem = context.Libraries
+                    .Include(l => l.Game)
+                    .FirstOrDefault(l => l.UserId == currentUserId && l.Game.GameName == gameName);
+
+                if (libraryItem == null)
+                {
+                    Console.WriteLine("Ошибка: Игра не найдена в вашей библиотеке.");
+                    return;
+                }
+
+                context.Libraries.Remove(libraryItem);
+                context.SaveChanges();
+
+                Console.WriteLine($"Игра '{libraryItem.Game.GameName}' успешно удалена из вашей библиотеки.");
+            }
         }
     }
 }

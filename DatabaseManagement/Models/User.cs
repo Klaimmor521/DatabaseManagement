@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Data.Entity;
-using static DatabaseManagement.PasswordHelper;
 
 namespace DatabaseManagement.Models
 {
@@ -19,12 +18,10 @@ namespace DatabaseManagement.Models
 
         public void Information(int currentUserId)
         {
-            using(var context = new GameLibraryContext())
+            using (var context = new GameLibraryContext())
             {
                 var user = context.Users.Include(u => u.Libraries).Include(u => u.Wishlists)
                     .SingleOrDefault(u => u.UserId == currentUserId);
-
-                //Console.WriteLine("User ID = " + currentUserId);
 
                 if (user == null)
                 {
@@ -40,15 +37,15 @@ namespace DatabaseManagement.Models
                 Console.WriteLine($"Количество желаемых игр: {user.Wishlists.Count}");
             }
         }
-        
+
         public void AllUserReviews(int currentUserId)
         {
             using (var context = new GameLibraryContext())
             {
                 var reviews = context.Reviews
-                    .Include(r => r.Game) 
-                    .Where(r => r.UserId == currentUserId) //Фильтрация по ID пользователя
-                    .OrderByDescending(r => r.CreatedAt) //Сортировка по дате добавления
+                    .Include(r => r.Game)
+                    .Where(r => r.UserId == currentUserId)
+                    .OrderByDescending(r => r.CreatedAt)
                     .ToList();
 
                 if (!reviews.Any())
@@ -67,10 +64,44 @@ namespace DatabaseManagement.Models
                 }
             }
         }
-        public void DeleteUser()
+
+        public void DeleteUser(int currentUserId)
         {
+            using (var context = new GameLibraryContext())
+            {
+                using (var transaction = context.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        int userIdToDelete = currentUserId;
 
+                        var reviews = context.Reviews.Where(r => r.UserId == userIdToDelete);
+                        context.Reviews.RemoveRange(reviews);
+
+                        var libraries = context.Libraries.Where(l => l.UserId == userIdToDelete);
+                        context.Libraries.RemoveRange(libraries);
+
+                        var wishlists = context.Wishlists.Where(w => w.UserId == userIdToDelete);
+                        context.Wishlists.RemoveRange(wishlists);
+
+                        var user = context.Users.Find(userIdToDelete);
+                        if (user != null)
+                        {
+                            context.Users.Remove(user);
+                        }
+
+                        context.SaveChanges();
+                        transaction.Commit();
+
+                        Console.WriteLine("Пользователь и все связанные данные успешно удалены.");
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        Console.WriteLine($"Ошибка: {ex.Message}. Операция отменена.");
+                    }
+                }
+            }
         }
-
     }
 }

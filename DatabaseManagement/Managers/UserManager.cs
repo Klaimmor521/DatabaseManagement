@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Data.Entity;
 using DatabaseManagement.Models;
 using static DatabaseManagement.PasswordHelper;
 
@@ -8,16 +9,17 @@ namespace DatabaseManagement
     public class UserManager
     {
         private int _currentUserId;
+
         Library library = new Library();
         Game game = new Game();
-        Review review = new Review();
         User user = new User();
         Wishlist wishlist = new Wishlist();
+
         public void Register()
         {
             Console.WriteLine("Регистрация:");
             string login = GetValidatedInput("Введите логин (минимум 3 символа): ", input => input.Length >= 3, "Логин должен содержать минимум 3 символа.");
-            string nickname = GetValidatedInput("Введите никнейм: ", input => input.Length >= 3, "Логин должен содержать минимум 3 символа.");
+            string nickname = GetValidatedInput("Введите никнейм: ", input => input.Length >= 3, "Никнейм должен содержать минимум 3 символа.");
             string email = GetValidatedInput("Введите email: ", input => input.Contains("@"), "Email должен содержать '@'.");
             string password = GetValidatedInput("Введите пароль (минимум 8 символов, 1 заглавная буква, 1 цифра): ", ValidatePassword, "Пароль должен быть минимум 8 символов, содержать хотя бы одну заглавную букву и одну цифру.");
 
@@ -25,7 +27,6 @@ namespace DatabaseManagement
 
             using (var context = new GameLibraryContext())
             {
-                //Проверка уникальности логина и email
                 if (context.Users.Any(u => u.Login == login))
                 {
                     Console.WriteLine("Логин уже занят.");
@@ -36,19 +37,20 @@ namespace DatabaseManagement
                     Console.WriteLine("Email уже занят.");
                     return;
                 }
-                //Сохранение пользователя
-                var user = new User
+
+                var newUser = new User
                 {
                     Nickname = nickname,
                     Login = login,
                     Email = email,
                     Password = hashedPassword
                 };
-                context.Users.Add(user);
+                context.Users.Add(newUser);
                 context.SaveChanges();
                 Console.WriteLine("Регистрация успешна!");
             }
         }
+
         public void Login()
         {
             Console.WriteLine("Вход:");
@@ -65,19 +67,20 @@ namespace DatabaseManagement
                     Console.WriteLine("Пользователь не найден.");
                     return;
                 }
-                //Проверка пароля
+
                 if (!VerifyPassword(password, user.Password))
                 {
                     Console.WriteLine("Неверный пароль.");
                     return;
                 }
-                _currentUserId = user.UserId; //Сохранение ID текущего пользователя
-                //Console.WriteLine("User ID = " + _currentUserId);
+
+                _currentUserId = user.UserId;
                 Console.WriteLine("Вход выполнен успешно!");
-                ShowProfileMenu(); //Переход в меню Профиля
+                ShowProfileMenu(_currentUserId);
             }
         }
-        public void ShowProfileMenu()
+
+        public void ShowProfileMenu(int currentUserId)
         {
             Console.WriteLine("Это Ваша игровая библиотека!");
             Console.WriteLine("Вы в Меню профиля! Выберите действие:");
@@ -90,21 +93,23 @@ namespace DatabaseManagement
             switch (choice)
             {
                 case "1":
-                    library.LibraryMenu(_currentUserId);
+                    library.LibraryMenu(currentUserId);
                     break;
                 case "2":
-                    game.GameMenu();
+                    game.GameMenu(currentUserId);
                     break;
                 case "3":
-                    UserMenu(_currentUserId);
+                    UserMenu(currentUserId);
                     break;
                 case "4":
                     return;
                 default:
                     Console.WriteLine("Неверный выбор, попробуйте снова.");
+                    ShowProfileMenu(currentUserId);
                     break;
             }
         }
+
         private void UserMenu(int currentUserId)
         {
             Console.WriteLine("\nПрофиль:");
@@ -123,41 +128,43 @@ namespace DatabaseManagement
             switch (choice)
             {
                 case "1":
-                    user.Information(_currentUserId);
-                    ShowProfileMenu();
+                    user.Information(currentUserId);
+                    ShowProfileMenu(currentUserId);
                     break;
                 case "2":
-                    UpdateName(_currentUserId);
-                    ShowProfileMenu();
+                    UpdateName(currentUserId);
+                    ShowProfileMenu(currentUserId);
                     break;
                 case "3":
-                    UpdateEmail(_currentUserId);
-                    ShowProfileMenu();
+                    UpdateEmail(currentUserId);
+                    ShowProfileMenu(currentUserId);
                     break;
                 case "4":
-                    UpdatePassword(_currentUserId);
-                    ShowProfileMenu();
+                    UpdatePassword(currentUserId);
+                    ShowProfileMenu(currentUserId);
                     break;
                 case "5":
-                    wishlist.WishlistMenu(_currentUserId);
-                    ShowProfileMenu();
+                    wishlist.WishlistMenu(currentUserId);
+                    ShowProfileMenu(currentUserId);
                     break;
                 case "6":
-                    UserReviews();
-                    ShowProfileMenu();
+                    UserReviews(currentUserId);
+                    ShowProfileMenu(currentUserId);
                     break;
                 case "7":
-                    user.DeleteUser();
+                    user.DeleteUser(currentUserId);
                     break;
                 case "8":
-                    game.GameMenu();
+                    game.GameMenu(currentUserId);
                     break;
                 default:
                     Console.WriteLine("Неверный выбор, попробуйте снова.");
+                    UserMenu(currentUserId);
                     break;
             }
         }
-        private void UserReviews()
+
+        private void UserReviews(int currentUserId)
         {
             Console.WriteLine("\nМои отзывы:");
             Console.WriteLine("1. Список моих отзывов");
@@ -171,44 +178,39 @@ namespace DatabaseManagement
             switch (choice)
             {
                 case "1":
-                    user.AllUserReviews(_currentUserId);
+                    user.AllUserReviews(currentUserId);
                     break;
                 case "2":
-                    DeleteReview(_currentUserId);
+                    DeleteReview(currentUserId);
                     break;
                 case "3":
-                    UpdateReview(_currentUserId);
+                    UpdateReview(currentUserId);
                     break;
                 case "4":
-                    UserMenu(_currentUserId);
+                    UserMenu(currentUserId);
                     break;
                 default:
                     Console.WriteLine("Неверный выбор, попробуйте снова.");
+                    UserReviews(currentUserId);
                     break;
             }
         }
+
         public void UpdateName(int currentUserId)
         {
             using (var context = new GameLibraryContext())
             {
-                var user = context.Users.FirstOrDefault(u => u.UserId == currentUserId);
+                var userToUpdate = context.Users.FirstOrDefault(u => u.UserId == currentUserId);
 
-                if (user == null)
+                if (userToUpdate == null)
                 {
                     Console.WriteLine("Пользователь не найден.");
                     return;
                 }
 
-                Console.Write("Введите новой никнейм: ");
-                string newName = Console.ReadLine();
+                string newName = GetValidatedInput("Введите никнейм: ", input => input.Length >= 3, "Никнейм должен содержать минимум 3 символа.");
 
-                if (string.IsNullOrWhiteSpace(newName))
-                {
-                    Console.WriteLine("Имя не может быть пустым.");
-                    return;
-                }
-
-                user.Nickname = newName;
+                userToUpdate.Nickname = newName;
 
                 try
                 {
@@ -221,55 +223,140 @@ namespace DatabaseManagement
                 }
             }
         }
-        public void ReviewMenu()
-        {
-            Game game = new Game();
-            Console.WriteLine("\nОтзывы:");
-            Console.WriteLine("1. Посмотреть отзывы об игре");
-            Console.WriteLine("2. Добавить отзыв");
-            Console.WriteLine("3. Назад");
-            Console.Write("Выберите действие: ");
 
-            string choice = Console.ReadLine();
-
-            switch (choice)
-            {
-                case "1":
-                    review.ViewReviewsAboutThisGame();
-                    game.GameMenu();
-                    break;
-                case "2":
-                    AddReview(_currentUserId);
-                    game.GameMenu();
-                    break;
-                case "3":
-                    game.GameMenu();
-                    break;
-                default:
-                    Console.WriteLine("Неверный выбор, попробуйте снова.");
-                    break;
-            }
-        }
-        public void AddReview(int currentUserId)
-        {
-
-        }
         public void UpdateReview(int currentUserId)
         {
+            using (var context = new GameLibraryContext())
+            {
+                Console.Write("Введите название игры, отзыв для которой хотите обновить: ");
+                string gameName = Console.ReadLine();
 
+                var review = context.Reviews
+                    .Include(r => r.Game)
+                    .FirstOrDefault(r => r.UserId == currentUserId && r.Game.GameName == gameName);
+
+                int rating;
+                while (true)
+                {
+                    Console.Write("Введите оценку (1-10): ");
+                    string input = Console.ReadLine();
+
+                    if (int.TryParse(input, out rating) && rating >= 1 && rating <= 10)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Ошибка: Оценка должна быть числом от 1 до 10. Попробуйте снова.");
+                    }
+                }
+
+                string reviewText;
+                while (true)
+                {
+                    Console.Write("Введите текст отзыва: ");
+                    reviewText = Console.ReadLine();
+
+                    if (!string.IsNullOrWhiteSpace(reviewText))
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Ошибка: Текст отзыва не может быть пустым. Попробуйте снова.");
+                    }
+                }
+
+                review.Rating = rating;
+                review.ReviewText = reviewText;
+                review.CreatedAt = DateTime.Now;
+
+                context.SaveChanges();
+
+                Console.WriteLine("Отзыв успешно обновлён!");
+            }
         }
+
         public void DeleteReview(int currentUserId)
         {
+            using (var context = new GameLibraryContext())
+            {
+                Console.Write("Введите название игры, отзыв для которой хотите удалить: ");
+                string gameName = Console.ReadLine();
 
+                var review = context.Reviews
+                    .Include(r => r.Game)
+                    .FirstOrDefault(r => r.UserId == currentUserId && r.Game.GameName == gameName);
+
+                if (review == null)
+                {
+                    Console.WriteLine("Ошибка: Отзыв для данной игры не найден.");
+                    return;
+                }
+
+                context.Reviews.Remove(review);
+                context.SaveChanges();
+
+                Console.WriteLine($"Отзыв для игры '{review.Game.GameName}' успешно удалён.");
+            }
         }
+
         public void UpdateEmail(int currentUserId)
         {
+            using (var context = new GameLibraryContext())
+            {
+                var userToUpdate = context.Users.FirstOrDefault(u => u.UserId == currentUserId);
 
+                if (userToUpdate == null)
+                {
+                    Console.WriteLine("Пользователь не найден.");
+                    return;
+                }
+
+                string newEmail = GetValidatedInput("Введите email: ", input => input.Contains("@"), "Email должен содержать '@'.");
+
+                userToUpdate.Email = newEmail;
+
+                try
+                {
+                    context.SaveChanges();
+                    Console.WriteLine("Email пользователя успешно обновлен.");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Ошибка при обновлении email: {ex.Message}");
+                }
+            }
         }
+
         public void UpdatePassword(int currentUserId)
         {
+            using (var context = new GameLibraryContext())
+            {
+                var userToUpdate = context.Users.FirstOrDefault(u => u.UserId == currentUserId);
 
+                if (userToUpdate == null)
+                {
+                    Console.WriteLine("Пользователь не найден.");
+                    return;
+                }
+
+                string newPassword = GetValidatedInput("Введите пароль (минимум 8 символов, 1 заглавная буква, 1 цифра): ", ValidatePassword, "Пароль должен быть минимум 8 символов, содержать хотя бы одну заглавную букву и одну цифру.");
+
+                userToUpdate.Password = newPassword;
+
+                try
+                {
+                    context.SaveChanges();
+                    Console.WriteLine("Пароль пользователя успешно обновлен.");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Ошибка при обновлении пароля: {ex.Message}");
+                }
+            }
         }
+
         private string GetValidatedInput(string prompt, Func<string, bool> validate, string errorMessage)
         {
             while (true)

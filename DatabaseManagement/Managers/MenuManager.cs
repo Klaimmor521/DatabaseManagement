@@ -4,7 +4,7 @@ namespace DatabaseManagement
 {
     public class MenuManager
     {
-        private UserManager _userManager = new UserManager();
+       private UserManager _userManager = new UserManager();
         public void ShowMainMenu()
         {
             while (true)
