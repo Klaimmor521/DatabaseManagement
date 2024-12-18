@@ -113,7 +113,9 @@ namespace DatabaseManagement
                     UserMenu(currentUserId);
                     break;
                 case "4. Назад":
-                    return;
+                    MenuManager menuManager = new MenuManager();
+                    menuManager.ShowMainMenu();
+                    break;
                 default:
                     AnsiConsole.MarkupLine("[bold red]Неверный выбор, попробуйте снова.[/]");
                     ShowProfileMenu(currentUserId);
